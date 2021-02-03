@@ -1,0 +1,15 @@
+<odoo>
+    <data>
+        <record id="custom_project_task_type_form_inherit_hall_booking" model="ir.ui.view">
+            <field name="name">project.task.type.inherit.hall_booking</field>
+            <field name="model">project.task.type</field>
+            <field name="inherit_id" ref="project.task_type_edit"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='sequence']" position="before">
+                	<field name="custom_is_confirm"/>
+                    <field name="custom_is_canceled"/>
+            	</xpath>
+        	</field>
+    	</record>
+	</data>
+</odoo>

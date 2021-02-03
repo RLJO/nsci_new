@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="custom_view_product_custom_amenity_form" model="ir.ui.view">
+            <field name="name">product.custom.amenity.form</field>
+            <field name="model">product.custom.amenity</field>
+            <field name="arch" type="xml">
+                <form string="Product Custom Amenity">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="amenity_id"/>
+                            </group>
+                            <group>
+                                <field name="value"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="custom_view_product_custom_amenity_tree" model="ir.ui.view">
+            <field name="name">product.custom.amenity.tree</field>
+            <field name="model">product.custom.amenity</field>
+            <field name="arch" type="xml">
+                <tree string="Product Custom Amenity">
+                    <field name="amenity_id"/>
+                    <field name="value"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="custom_action_product_custom_amenity" model="ir.actions.act_window">
+            <field name="name">Product Amenitys</field>
+            <field name="res_model">product.custom.amenity</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="custom_view_product_custom_amenity_tree"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new fir product amenity.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

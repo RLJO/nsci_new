@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem name="Booking" id="custom_hall_booking_main_menu" web_icon="hall_booking_system,static/description/icon.png"/>
+        <menuitem name="Booking Requests" id="custom_booking_request_menu" parent="custom_hall_booking_main_menu" sequence="1" action="hall_booking_system.custom_product_booking_request_action"/>
+        <menuitem name="Booking Products" id="custom_hall_room_request_menu" parent="custom_hall_booking_main_menu" sequence="1" action="custom_product_hall_room_action"/>
+
+        
+    	<menuitem name="Configuration" id="custom_booking_configuration_main_menu" parent="custom_hall_booking_main_menu" sequence="10"/>
+    	<menuitem name="Types" id="custom_product_hall_type_menu" parent="custom_booking_configuration_main_menu" sequence="1"	action="hall_booking_system.custom_action_product_hall_type"/>
+    	<menuitem name="Amenity Types" id="custom_type_amenty_menu" parent="custom_booking_configuration_main_menu" sequence="2"	action="hall_booking_system.custom_action_type_amenity"/>
+	</data>
+</odoo>

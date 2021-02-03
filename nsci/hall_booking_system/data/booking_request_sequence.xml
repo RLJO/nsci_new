@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="seq_custom_booking_request_confirm" model="ir.sequence">
+            <field name="name">Booking Request Confirm</field>
+            <field name="code">booking.request.confirm</field>
+            <field name="prefix">BOOKING/CONFIRM/</field>
+            <field name="padding">6</field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="report_booking_request_document">
+            <t t-call="web.external_layout">
+                <t t-set="doc" t-value="doc.with_context()" />
+                <div class="page">
+                    <div class="oe_structure"/>
+
+                    <h2 class="mt16">
+                        <span t-field="doc.name"/>
+                    </h2>
+                    <h5 class="mt16">
+                        <span t-field="doc.custom_booking_number"/>
+                    </h5>
+
+                    <table class="table" style="width:100%;">
+                    	<tr style="border-top:hidden; border-bottom:hidden;">
+                    		<td style="width:20%;">
+                                <strong>Customer:</strong>
+                            </td>
+                            <td style="width:30%;">
+                                <span t-field="doc.partner_id"/>
+                            </td>
+                            <td style="width:20%;">
+                                <strong>Project:</strong>
+                            </td>
+                            <td style="width:30%;">
+                                <span t-field="doc.project_id"/>
+                            </td>
+                       </tr>
+                       <tr style="border-top:hidden; border-bottom:hidden;">
+                            <td style="width:20%;">
+                                <strong>Assigned to:</strong>
+                            </td>
+                            <td style="width:30%;">
+                                <span t-field="doc.user_id"/>
+                            </td>
+                            <td style="width:20%;">
+                                <strong>Deadline:</strong>
+                            </td>
+                            <td style="width:30%;">
+                                <span t-field="doc.date_deadline"/>
+                            </td>
+                       </tr>
+                		<tr style="border-top:hidden; border-bottom:hidden;">
+                            <td style="width:20%;">
+                                <strong>Booking:</strong>
+                            </td>
+                            <td style="width:30%;">
+                                <span t-field="doc.custom_booking_id"/>
+                            </td>
+                            <td style="width:20%;">
+                                <strong>Organizer:</strong>
+                            </td>
+                            <td style="width:30%;">
+                                <span t-field="doc.custom_organizer_id"/>
+                            </td>
+                       </tr>
+                       <tr style="border-top:hidden; border-bottom:hidden;">
+                            <td style="width:20%;">
+                                <strong>Responsible:</strong>
+                            </td>
+                            <td style="width:30%;">
+                                <span t-field="doc.custom_responsible_id"/>
+                            </td>
+                            <td style="width:20%;">
+                                <strong>Location:</strong>
+                            </td>
+                            <td style="width:30%;">
+                                <span t-field="doc.custom_location_id"/>
+                            </td>
+                       </tr>
+                       <tr style="border-top:hidden; border-bottom:hidden;">
+                            <td style="width:20%;">
+                                <strong>Capacity:</strong>
+                            </td>
+                            <td style="width:30%;">
+                                <span t-field="doc.custom_capacity"/>
+                            </td>
+                            <td style="width:20%;">
+                                <strong>Services:</strong>
+                            </td>
+                            <td style="width:30%;">
+                            	<t t-set="services" t-value="doc.custom_services_print()"/>
+                                <span t-esc="services"/>
+                            </td>
+                       </tr>
+                       <tr style="border-top:hidden; border-bottom:hidden;">
+                            <td style="width:20%;">
+                                <strong>Start Date:</strong>
+                            </td>
+                            <td style="width:30%;">
+                                <span t-field="doc.custom_buffer_start_date"/>
+                            </td>
+                            <td style="width:20%;">
+                                <strong>End Date:</strong>
+                            </td>
+                            <td style="width:30%;">
+                                <span t-field="doc.custom_buffer_end_date"/>
+                            </td>
+                       </tr>
+                       <tr style="border-top:hidden; border-bottom:hidden;">
+                            <td style="width:20%;">
+                                <strong>Status:</strong>
+                            </td>
+                            <td style="width:30%;">
+                                <span t-field="doc.stage_id"/>
+                            </td>
+                            <td style="width:20%;">
+                            </td>
+                            <td style="width:30%;">
+                            </td>
+                        </tr>
+                    </table>
+                    <h4><strong>Booking Amenities</strong></h4>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <strong>Amenity</strong>
+                                </th>
+                                <th>
+                                    <strong>Value</strong>
+                                </th>
+                            </tr>
+                        </thead>
+                        <t t-foreach="doc.custom_booking_id.custom_product_amenity_ids" t-as="line">
+                            <tr>
+                                <td>
+                                    <span t-field="line.amenity_id"/>        
+                                </td>
+                                <td>
+                                    <span t-field="line.value"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </table>
+                </div>
+            </t>
+        </template>
+
+        <template id="report_booking_request">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="hall_booking_system.report_booking_request_document"/>
+                </t>
+            </t>
+        </template>
+        <!-- <report 
+            id="action_report_booking_request"
+            string="Booking Confirmation Slip"
+            model="project.task" 
+            report_type="qweb-pdf"
+            file="hall_booking_system.report_booking_request" 
+            name="hall_booking_system.report_booking_request"
+        /> --> <!-- odoo14 -->
+        <record id="action_report_booking_request" model="ir.actions.report">
+            <field name="name">Booking Confirmation Slip</field>
+            <field name="model">project.task</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">hall_booking_system.report_booking_request</field>
+            <field name="report_file">hall_booking_system.report_booking_request</field>
+            <field name="binding_model_id" ref="model_project_task"/>
+            <field name="binding_type">report</field>
+        </record>
+    </data>
+</odoo>

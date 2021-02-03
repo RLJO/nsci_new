@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="custom_view_type_amenity_form" model="ir.ui.view">
+            <field name="name">type.amenity.form</field>
+            <field name="model">type.amenity</field>
+            <field name="arch" type="xml">
+                <form string="Type Amenity">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="custom_view_type_amenity_tree" model="ir.ui.view">
+            <field name="name">type.amenity.tree</field>
+            <field name="model">type.amenity</field>
+            <field name="arch" type="xml">
+                <tree string="Type Amenity">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="custom_action_type_amenity" model="ir.actions.act_window">
+            <field name="name">Amenity Types</field>
+            <field name="res_model">type.amenity</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="custom_view_type_amenity_tree"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new fir type amenity.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

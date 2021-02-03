@@ -1,0 +1,79 @@
+<odoo>
+    <data>
+        <record id="custom_product_normal_form_view_inherit_hall_booking" model="ir.ui.view">
+            <field name="name">product.product.inherit.hall_booking</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button class="oe_stat_button" type="object" attrs="{'invisible':[('custom_booking_ok', '!=', True)]}" name="custom_show_get_booking_requests" icon="fa-tasks" string="Booking Requests">
+                    </button>
+                </xpath>
+                <xpath expr="//page[last()]" position="before">
+                    <page string="Booking Info" name="booking" attrs="{'invisible': [('custom_booking_ok', '!=', True)]}">
+                    	<group>
+                    		<group>
+                                <field name="custom_booking_ok" invisible="1"/>
+                    			<field name="custom_organizer_id" attrs="{'required': [('custom_booking_ok', '=', True)]}"/>
+                    			<field name="custom_location_id" string="Location" widget="res_partner_many2one" context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}" options='{"always_reload": True}' attrs="{'required': [('custom_booking_ok', '=', True)]}"/>
+                			</group>
+                			<group>
+                				<field name="custom_responsible_id" attrs="{'required': [('custom_booking_ok', '=', True)]}"/>
+                				<field name="custom_capacity" attrs="{'required': [('custom_booking_ok', '=', True)]}"/>
+                                <field name="custom_booking_type_id" attrs="{'required': [('custom_booking_ok', '=', True)]}"/>
+            				</group>
+                		</group>
+                		<notebook>
+	                		<page string="Amenities" name="amenity">
+	                			<field name="custom_product_amenity_ids"/>
+	            			</page>
+	            		</notebook>
+                	</page>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="product_template_search_view_inherit_booking" model="ir.ui.view">
+            <field name="name">product.template.inherit.booking</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_search_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='filter_to_sell']" position="after">
+                    <filter string="Can be books" name="filter_to_books" domain="[('custom_booking_ok','=',True)]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="custom_product_template_form_view_inherit_hall_booking" model="ir.ui.view">
+            <field name="name">product.template.inherit.hall_booking</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='options']//div[last()]" position="after">
+                    <div>
+                        <field name="custom_booking_ok"/>
+                        <label for="custom_booking_ok"/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="custom_product_hall_room_action" model="ir.actions.act_window">
+            <field name="name">Booking Products</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.product</field>
+            <field name="view_mode">kanban,tree,form,activity</field>
+            <field name="context">{
+                "search_default_filter_to_books":1,
+                "default_custom_booking_ok": 1
+            }</field>
+            <field name="view_id" ref="product.product_product_tree_view"/>
+            <field name="search_view_id" ref="product.product_search_form_view"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new booking request
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>
