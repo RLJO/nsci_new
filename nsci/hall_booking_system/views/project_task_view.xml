@@ -24,14 +24,15 @@
                     <field name="remark"/>
                     <field name="other_info"/>
                     <field name="cancellation_date" widget="date"/>
-                    <field name="member_id"/>
+                    <field name="member_id" domain="[('search_default_all_members': 1)]"/>
                 </xpath>
 
                 <xpath  expr="//field[@name='tag_ids']" position="after">
                     <field name="number_of_rooms"/>
                     <field name="number_of_adults"/>
                     <field name="number_of_children"/>
-                    <field name="total_guests"/>
+                    <field name="guest_or_member"/>
+<!--                    <field name="capacity"/>-->
                 </xpath>
 
                 <xpath expr="//page[last()]" position="after">
@@ -49,7 +50,8 @@
                                 <field name="custom_end_date" attrs="{'readonly': [('custom_is_confirm_stage', '!=', False)], 'required': [('custom_is_booking_request', '=', True)]}"/>
                                 <field name="custom_buffer_start_date" attrs="{'readonly': [('custom_is_confirm_stage', '!=', False)], 'required': [('custom_is_booking_request', '=', True)]}"/>
                                 <field name="custom_buffer_end_date" attrs="{'readonly': [('custom_is_confirm_stage', '!=', False)], 'required': [('custom_is_booking_request', '=', True)]}"/>
-                			</group>
+
+                            </group>
                 			<group>
                                 <field name="custom_organizer_id" attrs="{'readonly': [('custom_is_confirm_stage', '!=', False)], 'required': [('custom_is_booking_request', '=', True)]}"/>
                                 <field name="custom_location_id" string="Location" widget="res_partner_many2one" context="{'res_partner_search_mode': 'customer', 'show_address': 1, 'show_vat': True}" options='{"always_reload": True}' attrs="{'readonly': [('custom_is_confirm_stage', '!=', False)]}"/>
@@ -58,9 +60,20 @@
                                 <field name="total_no_nights"/>
                                 <field name="room_number_id" domain="[('custom_booking_ok','=',True)]"/>
                                 <field name="payment_terms"/>
+                                <field name="room_price"/>
                             </group>
                 		</group>
                 	</page>
+                    <page string="Guest Room Position">
+                        <group>
+                            <field name = "guest_room_type"/>
+                            <field name = "guest_room_no_id"/>
+                            <field name = "guest_number_of_children"/>
+                            <field name = "guest_number_of_adults"/>
+                            <field name = "total_no_guests"/>
+<!--                            <field name = "total_no_guests"/>-->
+                        </group>
+                    </page>
                 </xpath>
             </field>
         </record>
@@ -69,7 +82,7 @@
             <field name="name">Booking Requests</field>
             <field name="res_model">project.task</field>
             <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
-            <field name="domain">[('custom_is_booking_request', '=', True)]</field>
+<!--            <field name="domain">[('custom_is_booking_request', '=', True)]</field>-->
             <field name="context">{
                 'default_custom_is_booking_request': 1
             }</field>

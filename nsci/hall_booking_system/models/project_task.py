@@ -11,7 +11,7 @@ class ProjectTask(models.Model):
 
     custom_is_booking_request = fields.Boolean(
         string="Is Booking",
-        # copy=true
+        # copy=tru
         copy=True
     )
     custom_is_confirm_stage = fields.Boolean(
@@ -24,7 +24,7 @@ class ProjectTask(models.Model):
     )
     custom_booking_id = fields.Many2one(
         'product.category',
-        string="Booking"
+        string="Room Type"
     )
     custom_service_ids = fields.Many2many(
         'product.hall.type',
@@ -96,14 +96,14 @@ class ProjectTask(models.Model):
             'context': ctx,
         }
 
-    @api.onchange('custom_booking_id')
-    def _onchange_custom_booking_id(self):
-        if self.custom_booking_id:
-            self.custom_organizer_id = self.custom_booking_id.custom_organizer_id.id
-            self.custom_location_id = self.custom_booking_id.custom_location_id.id
-            self.custom_responsible_id = self.custom_booking_id.custom_responsible_id.id
-            self.custom_capacity = self.custom_booking_id.custom_capacity
-            self.custom_service_ids = [(6, 0, self.custom_booking_id.custom_booking_type_id.ids)]
+    # @api.onchange('custom_booking_id')
+    # def _onchange_custom_booking_id(self):
+    #     if self.custom_booking_id:
+    #         #self.custom_organizer_id = self.custom_booking_id.custom_organizer_id.id
+    #         self.custom_location_id = self.custom_booking_id.custom_location_id.id
+    #         self.custom_responsible_id = self.custom_booking_id.custom_responsible_id.id
+    #         self.custom_capacity = self.custom_booking_id.custom_capacity
+    #         self.custom_service_ids = [(6, 0, self.custom_booking_id.custom_booking_type_id.ids)]
 
     @api.onchange('custom_buffer_end_date')
     def _onchange_custom_buffer_end_date(self):
@@ -144,7 +144,7 @@ class ProjectTask(models.Model):
     remark = fields.Char(string="Remark")
     other_info = fields.Char(string="Other Info")
     cancellation_date = fields.Date(string="Cancellation Date")
-    member_id = fields.Char(string="Membership ID")
+    member_id = fields.Many2one('res.partner', string="Membership ID")
     room_number_id = fields.Many2one('product.product', string="Room Number ID")
     number_of_rooms = fields.Integer(string="Number of Rooms")
     number_of_adults = fields.Integer(string="No. of Adults")
@@ -155,18 +155,58 @@ class ProjectTask(models.Model):
     total_no_nights = fields.Integer(string="Total No. Nights", compute="_onchange_number_of_nights")
 
     payment_terms = fields.Many2one('account.payment.term', string="Payment Terms")
+    room_price = fields.Float(string="Room Price", compute="_onchange_room_type", store=True)
 
+    custom_name = fields.Char(string="Name")
+    custom_age = fields.Char(string="Age")
+
+    guest_room_type = fields.Char(string="Guest Room Type", compute="_onchange_guest_member")
+    guest_room_no_id = fields.Char(string="Guest Room No.", compute="_onchange_guest_member")
+    guest_number_of_children = fields.Char(string="Guest Number of Children", compute="_onchange_guest_member")
+    guest_number_of_adults = fields.Char(string="Guest Number of Adults", compute="_onchange_guest_member")
+    # room_no_column = fields.Char(string="Room No.")
+    total_no_guests = fields.Char(string="Total No. Guests", compute="_onchange_guest_member")
+
+    guest_or_member = fields.Char(string="Guest or Member")
+    # room_position = fields.One2many('custom.room.position', 'temp_field', string="Room Position")
+    # capacity = fields.Char(string="Capacity", compute="_onchange_room_number_id")
+
+    # @api.depends('room_number_id')
+    # def _onchange_room_number_id(self):
+    #     for record in self:
+    #         if record.room_number_id and record.room_number_id.custom_capacity:
+    #             record.capacity = record.room_number_id.custom_capacity
+
+    @api.onchange('guest_or_member', 'number_of_children', 'number_of_adults', 'total_guests', 'custom_booking_id', 'room_number_id')
+    def _onchange_guest_member(self):
+        if (self.guest_or_member == 'guest') and self.custom_booking_id and self.room_number_id and self.number_of_adults and self.total_guests or self.number_of_children:
+            self.guest_room_type = self.custom_booking_id.name
+            self.guest_room_no_id = self.room_number_id.name
+            self.guest_number_of_children = self.number_of_children
+            self.guest_number_of_adults = self.number_of_adults
+            self.total_no_guests = self.total_guests
+        else:
+            self.guest_room_type = "0"
+            self.guest_room_no_id = "0"
+            self.guest_number_of_children = "0"
+            self.guest_number_of_adults = "0"
+            self.total_no_guests = "0"
+
+    @api.depends('room_number_id', 'number_of_rooms')
+    def _onchange_room_type(self):
+        for record in self:
+            if record.room_number_id and record.number_of_rooms:
+                record.room_price = record.number_of_rooms * record.room_number_id.lst_price
 
     @api.onchange('number_of_adults', 'number_of_children', 'number_of_rooms')
     def _onchange_number_of_adultsChildren(self):
-        for i in self:
-            total = self.number_of_adults + self.number_of_children
-            if self.number_of_adults and self.number_of_rooms:
-                if ((float(total) / float(self.number_of_rooms)) > 4.0):
-                    raise ValidationError(_("More than 4 guests not allowed in a single room"))
+        for record in self:
+            total = record.number_of_adults + record.number_of_children
+            if record.number_of_adults and record.number_of_rooms or record.number_of_children:
+                if ((float(total) / float(record.number_of_rooms)) > 4):
+                    raise ValidationError(_("More than 4 guests not allowed in a single room."))
                 else:
-
-                    self.total_guests = total
+                    record.total_guests = total
 
     @api.onchange('custom_start_date', 'custom_end_date')
     def _onchange_number_of_nights(self):
@@ -182,6 +222,24 @@ class ProjectTask(models.Model):
         # start_date = self.custom_start_date.strftime("%dd/%mm%yyyy")
         # no_of_nights = end_date - start_date
         # self.total_no_nights = no_of_nights
+
+# class CustomRoomPosition(models.Model):
+#     _name = 'custom.room.position'
+#
+#     temp_field = fields.Many2one('project.task', string="temp")
+#
+
+    # @api.onchange('custom_booking_id', 'room_number_id', '')
+    # def on_change_room_type(self):
+    #     for record in self:
+    #         if record.custom_boking_id and record.room_number_id:
+    #             record.room_type_column = record.custom_booking_id
+    #             record.room_no_column = record.room_number_id
+
+
+
+
+
 
 
 
