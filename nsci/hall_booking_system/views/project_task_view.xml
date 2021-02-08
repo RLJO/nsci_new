@@ -14,7 +14,7 @@
                     <widget name="web_ribbon" title="Booked" attrs="{'invisible': [('custom_is_confirm_stage', '=', False)]}"/>
                     <widget name="web_ribbon" title="Canceled" bg_color="bg-danger" attrs="{'invisible': [('custom_is_cancel_stage', '=', False)]}"/>
                 </xpath>
-                <xpath  expr="//field[@name='partner_email']" position="before">
+                <xpath  expr="//field[@name='partner_id']" position="after">
                     <field name="guest_country"/>
                 </xpath>
                 <xpath  expr="//field[@name='partner_phone']" position="after">

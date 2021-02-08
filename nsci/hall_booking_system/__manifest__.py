@@ -30,7 +30,9 @@ For more details please check below screenshots and watch the video.
     'website' : 'wwww.probuse.com',
     'depends' : [
         'product',
-        'project'
+        'project',
+        'base',
+        'membership'
     ],
     'support': 'contact@probuse.com',
     'data' : [
