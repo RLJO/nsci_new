@@ -24,10 +24,14 @@
                     <field name="remark"/>
                     <field name="other_info"/>
                     <field name="cancellation_date" widget="date"/>
-                    <field name="member_id" domain="[('search_default_all_members': 1)]"/>
+<!--                    <field name="member_id"/>-->
+                    <field name="member_id" domain="[('free_member', '!=', False)]"/>
+<!--                    <field name="member_id" domain="[('free_member', 'in', ['invoiced', 'paid', 'free'])]"/>-->
+                    <field name="membership_id"/>
                 </xpath>
 
                 <xpath  expr="//field[@name='tag_ids']" position="after">
+                    <field name="room_number_id" domain="[('custom_booking_ok','=',True)]"/>
                     <field name="number_of_rooms"/>
                     <field name="number_of_adults"/>
                     <field name="number_of_children"/>
@@ -45,7 +49,7 @@
                                 <field name="custom_booking_number" attrs="{'invisible': [('custom_is_confirm_stage', '=', False)]}"/>
                                 <field name="custom_booking_id"/>
                     			<field name="custom_responsible_id" attrs="{'readonly': [('custom_is_confirm_stage', '!=', False)], 'required': [('custom_is_booking_request', '=', True)]}"/>
-                                <field name="custom_capacity" attrs="{'readonly': [('custom_is_confirm_stage', '!=', False)], 'required': [('custom_is_booking_request', '=', True)]}"/>
+                                <field name="custom_capacity_size" readonly="True"/>
                                 <field name="custom_start_date" attrs="{'readonly': [('custom_is_confirm_stage', '!=', False)], 'required': [('custom_is_booking_request', '=', True)]}"/>
                                 <field name="custom_end_date" attrs="{'readonly': [('custom_is_confirm_stage', '!=', False)], 'required': [('custom_is_booking_request', '=', True)]}"/>
                                 <field name="custom_buffer_start_date" attrs="{'readonly': [('custom_is_confirm_stage', '!=', False)], 'required': [('custom_is_booking_request', '=', True)]}"/>
@@ -58,7 +62,7 @@
                                 <field name="custom_service_ids" widget="many2many_tags" attrs="{'readonly': [('custom_is_confirm_stage', '!=', False)], 'required': [('custom_is_booking_request', '=', True)]}"/>
                                 <field name="agent_name"/>
                                 <field name="total_no_nights"/>
-                                <field name="room_number_id" domain="[('custom_booking_ok','=',True)]"/>
+
                                 <field name="payment_terms"/>
                                 <field name="room_price"/>
                             </group>
@@ -71,6 +75,7 @@
                             <field name = "guest_number_of_children"/>
                             <field name = "guest_number_of_adults"/>
                             <field name = "total_no_guests"/>
+<!--                            <field name="membership_id"/>-->
 <!--                            <field name = "total_no_guests"/>-->
                         </group>
                     </page>
@@ -93,5 +98,20 @@
                 </p>
             </field>
         </record>
+
+        <record id="sequence_in_members" model="ir.ui.view">
+            <field name="name">sequence.in.members</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                 <xpath  expr="//field[@name='name']" position="after">
+                     <h1>
+                        <field name="seq_name"/>
+                     </h1>
+                 </xpath>
+            </field>
+        </record>
     </data>
+
+
 </odoo>

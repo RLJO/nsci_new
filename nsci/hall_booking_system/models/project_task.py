@@ -6,6 +6,8 @@ from odoo.exceptions import UserError, Warning, ValidationError
 from datetime import datetime, date
 
 
+
+
 class ProjectTask(models.Model):
     _inherit = "project.task"
 
@@ -43,8 +45,9 @@ class ProjectTask(models.Model):
         'res.users',
         string="Responsible"
     )
-    custom_capacity = fields.Integer(
-        string="Capacity"
+    custom_capacity_size = fields.Integer(
+        string="Capacity",
+        compute="_onchange_room_id"
     )
     custom_start_date = fields.Datetime(
         string="Start Date"
@@ -100,7 +103,7 @@ class ProjectTask(models.Model):
     # def _onchange_custom_booking_id(self):
     #     if self.custom_booking_id:
     #         #self.custom_organizer_id = self.custom_booking_id.custom_organizer_id.id
-    #         self.custom_location_id = self.custom_booking_id.custom_location_id.id
+    #         self.custom_location_imember_idd = self.custom_booking_id.custom_location_id.id
     #         self.custom_responsible_id = self.custom_booking_id.custom_responsible_id.id
     #         self.custom_capacity = self.custom_booking_id.custom_capacity
     #         self.custom_service_ids = [(6, 0, self.custom_booking_id.custom_booking_type_id.ids)]
@@ -144,7 +147,7 @@ class ProjectTask(models.Model):
     remark = fields.Char(string="Remark")
     other_info = fields.Char(string="Other Info")
     cancellation_date = fields.Date(string="Cancellation Date")
-    member_id = fields.Many2one('res.partner', string="Membership ID")
+    member_id = fields.Many2one('res.partner', string="Member ID")
     room_number_id = fields.Many2one('product.product', string="Room Number ID")
     number_of_rooms = fields.Integer(string="Number of Rooms")
     number_of_adults = fields.Integer(string="No. of Adults")
@@ -156,7 +159,7 @@ class ProjectTask(models.Model):
 
     payment_terms = fields.Many2one('account.payment.term', string="Payment Terms")
     room_price = fields.Float(string="Room Price", compute="_onchange_room_type", store=True)
-
+    membership_id = fields.Char(string = 'Membership ID', compute="_onchange_room_number_id")
     custom_name = fields.Char(string="Name")
     custom_age = fields.Char(string="Age")
 
@@ -171,11 +174,21 @@ class ProjectTask(models.Model):
     # room_position = fields.One2many('custom.room.position', 'temp_field', string="Room Position")
     # capacity = fields.Char(string="Capacity", compute="_onchange_room_number_id")
 
-    # @api.depends('room_number_id')
-    # def _onchange_room_number_id(self):
-    #     for record in self:
-    #         if record.room_number_id and record.room_number_id.custom_capacity:
-    #             record.capacity = record.room_number_id.custom_capacity
+    @api.depends('room_number_id')
+    def _onchange_room_id(self):
+        for record in self:
+            if record.room_number_id and record.room_number_id.custom_capacity:
+                record.custom_capacity_size = record.room_number_id.custom_capacity
+            # if record.member_id:
+            #     record.membership_id = record.member_id.seq_name
+            else:
+                record.custom_capacity_size = 0
+
+    @api.onchange('member_id')
+    def _onchange_member_id(self):
+        for record in self:
+            if record.member_id:
+                record.membership_id = str(record.member_id.name) + " " + str(record.member_id.seq_name)
 
     @api.onchange('guest_or_member', 'number_of_children', 'number_of_adults', 'total_guests', 'custom_booking_id', 'room_number_id')
     def _onchange_guest_member(self):
@@ -198,13 +211,13 @@ class ProjectTask(models.Model):
             if record.room_number_id and record.number_of_rooms:
                 record.room_price = record.number_of_rooms * record.room_number_id.lst_price
 
-    @api.onchange('number_of_adults', 'number_of_children', 'number_of_rooms')
+    @api.onchange('number_of_adults', 'number_of_children', 'number_of_rooms', 'custom_capacity_size')
     def _onchange_number_of_adultsChildren(self):
         for record in self:
             total = record.number_of_adults + record.number_of_children
             if record.number_of_adults and record.number_of_rooms or record.number_of_children:
-                if ((float(total) / float(record.number_of_rooms)) > 4):
-                    raise ValidationError(_("More than 4 guests not allowed in a single room."))
+                if ((float(total) / float(record.number_of_rooms)) > record.custom_capacity_size):
+                    raise ValidationError(_("More than "+str(record.custom_capacity_size)+" guests not allowed in a single room."))
                 else:
                     record.total_guests = total
 
@@ -213,15 +226,32 @@ class ProjectTask(models.Model):
         if self.custom_end_date and self.custom_start_date:
             date1 = datetime.strptime(str(self.custom_end_date), '%Y-%m-%d %H:%M:%S')
             date2 = datetime.strptime(str(self.custom_start_date), '%Y-%m-%d %H:%M:%S')
-            r = relativedelta.relativedelta(date1, date2)
-            # time_min = r.days * 1440 + r.hours * 60 + r.minutes
-            # time = time_min / 60
-            self.total_no_nights = r.days
+            if date2 >= datetime.today():
+                r = relativedelta.relativedelta(date1, date2)
+                # time_min = r.days * 1440 + r.hours * 60 + r.minutes
+                # time = time_min / 60
+                self.total_no_nights = r.days
+            else:
+                raise ValidationError(_("Select a valid Start date."))
+
         # for i in self:
         # end_date = self.custom_end_date.strftime("%dd/%mm%yyyy")
         # start_date = self.custom_start_date.strftime("%dd/%mm%yyyy")
         # no_of_nights = end_date - start_date
         # self.total_no_nights = no_of_nights
+
+class MembersSequence(models.Model):
+    _inherit = 'res.partner'
+
+    seq_name = fields.Char(string="Sequence", readonly=True, required=True, copy=False, default='New')
+
+    @api.model
+    def create(self, vals):
+        if vals.get('seq_name', 'New') == 'New':
+            vals['seq_name'] = self.env['ir.sequence'].next_by_code(
+                'res.partner.sequence') or 'New'
+        result = super(MembersSequence, self).create(vals)
+        return result
 
 # class CustomRoomPosition(models.Model):
 #     _name = 'custom.room.position'
