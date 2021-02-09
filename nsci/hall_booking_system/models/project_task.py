@@ -189,6 +189,8 @@ class ProjectTask(models.Model):
         for record in self:
             if record.member_id:
                 record.membership_id = str(record.member_id.name) + " " + str(record.member_id.seq_name)
+            else:
+                record.membership_id = "0"
 
     @api.onchange('guest_or_member', 'number_of_children', 'number_of_adults', 'total_guests', 'custom_booking_id',
                   'room_number_id')
@@ -212,6 +214,8 @@ class ProjectTask(models.Model):
         for record in self:
             if record.room_number_id and record.number_of_rooms:
                 record.room_price = record.number_of_rooms * record.room_number_id.lst_price
+            else:
+                record.room_price = 0
 
     @api.onchange('number_of_adults', 'number_of_children', 'number_of_rooms', 'custom_capacity_size')
     def _onchange_number_of_adultsChildren(self):
@@ -223,6 +227,8 @@ class ProjectTask(models.Model):
                         _("More than " + str(record.custom_capacity_size) + " guests not allowed in a single room."))
                 else:
                     record.total_guests = total
+            else:
+                record.total_guests = 0
 
     @api.onchange('custom_start_date', 'custom_end_date')
     def _onchange_number_of_nights(self):
