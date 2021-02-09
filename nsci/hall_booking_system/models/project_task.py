@@ -28,11 +28,12 @@ class ProjectTask(models.Model):
     )
     custom_service_ids = fields.Many2many(
         'product.hall.type',
-        string="Services"
+        string="Property Name"
     )
     custom_organizer_id = fields.Many2one(
         'res.partner',
-        string="Supervisor"
+        string="Supervisor",
+        compute="_onchange_roomid_orgnaizer"
     )
     custom_location_id = fields.Many2one(
         'res.partner',
@@ -41,7 +42,8 @@ class ProjectTask(models.Model):
     )
     custom_responsible_id = fields.Many2one(
         'res.users',
-        string="Responsible"
+        string="Responsible",
+        compute = "_onchange_roomid_responsible"
     )
     custom_capacity_size = fields.Integer(
         string="Capacity",
@@ -105,6 +107,21 @@ class ProjectTask(models.Model):
     #         self.custom_responsible_id = self.custom_booking_id.custom_responsible_id.id
     #         self.custom_capacity = self.custom_booking_id.custom_capacity
     #         self.custom_service_ids = [(6, 0, self.custom_booking_id.custom_booking_type_id.ids)]
+    @api.depends('room_number_id')
+    def _onchange_roomid_responsible(self):
+        for record in self:
+            if record.room_number_id:
+                record.custom_responsible_id = record.room_number_id.custom_responsible_id
+            else:
+                record.custom_responsible_id = "0"
+
+    @api.depends('room_number_id')
+    def _onchange_roomid_orgnaizer(self):
+        for record in self:
+            if record.room_number_id:
+                record.custom_organizer_id = record.room_number_id.custom_organizer_id
+            else:
+                record.custom_organizer_id = "0"
 
     @api.onchange('custom_buffer_end_date')
     def _onchange_custom_buffer_end_date(self):
@@ -139,6 +156,7 @@ class ProjectTask(models.Model):
         self.custom_is_confirm_stage = False
         self.custom_is_cancel_stage = True
 
+    guest_name = fields.Char(string="Guest Name", compute="_onchange_membership")
     guest_country = fields.Char(string="Guest Country")
     contact_person = fields.Char(string="Contact Person")
 
@@ -173,6 +191,13 @@ class ProjectTask(models.Model):
 
     # room_position = fields.One2many('custom.room.position', 'temp_field', string="Room Position")
     # capacity = fields.Char(string="Capacity", compute="_onchange_room_number_id")
+
+    @api.onchange('member_id')
+    def _onchange_membership(self):
+        for record in self:
+            if record.member_id:
+                record.guest_name = record.member_id.name
+
 
     @api.depends('room_number_id')
     def _onchange_room_id(self):

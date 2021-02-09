@@ -25,6 +25,9 @@
                     <field name="other_info"/>
                     <field name="cancellation_date" widget="date"/>
 <!--                    <field name="member_id"/>-->
+                </xpath>
+
+                <xpath  expr="//field[@name='partner_id']" position="before">
                     <field name="member_id" domain="[('free_member', '!=', False)]"/>
 <!--                    <field name="member_id" domain="[('free_member', 'in', ['invoiced', 'paid', 'free'])]"/>-->
                     <field name="membership_id"/>
@@ -70,6 +73,7 @@
                 	</page>
                     <page string="Guest Room Position">
                         <group>
+                            <field name="guest_name"/>
                             <field name = "guest_room_type"/>
                             <field name = "guest_room_no_id"/>
                             <field name = "guest_number_of_children"/>
