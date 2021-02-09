@@ -156,7 +156,7 @@ class ProjectTask(models.Model):
         self.custom_is_confirm_stage = False
         self.custom_is_cancel_stage = True
 
-    guest_name = fields.Char(string="Guest Name", compute="_onchange_membership")
+    # guest_name = fields.Char(string="Guest Name", compute="_onchange_membership")
     guest_country = fields.Char(string="Guest Country")
     contact_person = fields.Char(string="Contact Person")
 
@@ -192,11 +192,11 @@ class ProjectTask(models.Model):
     # room_position = fields.One2many('custom.room.position', 'temp_field', string="Room Position")
     # capacity = fields.Char(string="Capacity", compute="_onchange_room_number_id")
 
-    @api.onchange('member_id')
-    def _onchange_membership(self):
-        for record in self:
-            if record.member_id:
-                record.guest_name = record.member_id.name
+    # @api.onchange('member_id')
+    # def _onchange_membership(self):
+    #     for record in self:
+    #         if record.member_id:
+    #             record.guest_name = record.member_id.name
 
 
     @api.depends('room_number_id')

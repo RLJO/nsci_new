@@ -73,7 +73,7 @@
                 	</page>
                     <page string="Guest Room Position">
                         <group>
-                            <field name="guest_name"/>
+<!--                            <field name="guest_name"/>-->
                             <field name = "guest_room_type"/>
                             <field name = "guest_room_no_id"/>
                             <field name = "guest_number_of_children"/>
