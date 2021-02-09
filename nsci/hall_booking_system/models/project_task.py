@@ -33,7 +33,7 @@ class ProjectTask(models.Model):
     custom_organizer_id = fields.Many2one(
         'res.partner',
         string="Supervisor",
-        compute="_onchange_roomid_orgnaizer"
+        # compute="_onchange_roomid_orgnaizer"
     )
     custom_location_id = fields.Many2one(
         'res.partner',
@@ -43,7 +43,7 @@ class ProjectTask(models.Model):
     custom_responsible_id = fields.Many2one(
         'res.users',
         string="Responsible",
-        compute = "_onchange_roomid_responsible"
+        # compute = "_onchange_roomid_responsible"
     )
     custom_capacity_size = fields.Integer(
         string="Capacity",
