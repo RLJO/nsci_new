@@ -61,7 +61,7 @@ class ProductProduct(models.Model):
 
     def custom_show_get_booking_requests(self):
         for rec in self:
-            res = self.env.ref('hall_booking_system.custom_product_booking_request_action')
+            res = rec.env.ref('hall_booking_system.custom_product_booking_request_action')
             res = res.read()[0]
             res['domain'] = str([('id', 'in', self.custom_task_ids.ids)])
-        return res    
+            return res

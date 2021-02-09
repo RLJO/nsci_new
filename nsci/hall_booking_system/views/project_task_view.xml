@@ -31,9 +31,9 @@
                 </xpath>
 
                 <xpath  expr="//field[@name='tag_ids']" position="after">
-                    <field name="room_number_id" domain="[('custom_booking_ok','=',True)]"/>
-                    <field name="number_of_rooms"/>
-                    <field name="number_of_adults"/>
+                    <field name="room_number_id" domain="[('custom_booking_ok','=',True)]" attrs="{'required': [('custom_is_booking_request', '=', True)]}"/>
+                    <field name="number_of_rooms" attrs="{'required': [('custom_is_booking_request', '=', True)]}"/>
+                    <field name="number_of_adults" attrs="{'required': [('custom_is_booking_request', '=', True)]}"/>
                     <field name="number_of_children"/>
                     <field name="guest_or_member"/>
 <!--                    <field name="capacity"/>-->
@@ -52,8 +52,8 @@
                                 <field name="custom_capacity_size" readonly="True"/>
                                 <field name="custom_start_date" attrs="{'readonly': [('custom_is_confirm_stage', '!=', False)], 'required': [('custom_is_booking_request', '=', True)]}"/>
                                 <field name="custom_end_date" attrs="{'readonly': [('custom_is_confirm_stage', '!=', False)], 'required': [('custom_is_booking_request', '=', True)]}"/>
-                                <field name="custom_buffer_start_date" attrs="{'readonly': [('custom_is_confirm_stage', '!=', False)], 'required': [('custom_is_booking_request', '=', True)]}"/>
-                                <field name="custom_buffer_end_date" attrs="{'readonly': [('custom_is_confirm_stage', '!=', False)], 'required': [('custom_is_booking_request', '=', True)]}"/>
+                                <field name="custom_buffer_start_date" attrs="{'readonly': [('custom_is_confirm_stage', '!=', False)]}"/>
+                                <field name="custom_buffer_end_date" attrs="{'readonly': [('custom_is_confirm_stage', '!=', False)]}"/>
 
                             </group>
                 			<group>

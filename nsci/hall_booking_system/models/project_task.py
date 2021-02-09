@@ -6,8 +6,6 @@ from odoo.exceptions import UserError, Warning, ValidationError
 from datetime import datetime, date
 
 
-
-
 class ProjectTask(models.Model):
     _inherit = "project.task"
 
@@ -119,18 +117,19 @@ class ProjectTask(models.Model):
             if stage_id.custom_is_confirm:
                 self.custom_is_confirm_stage = True
                 self.custom_is_cancel_stage = False
-                if self.custom_booking_id:
-                    for task in self.custom_booking_id.custom_task_ids:
-                        if task.stage_id.custom_is_confirm:
-                            if task.custom_buffer_start_date <= self.custom_buffer_start_date and task.custom_buffer_end_date >= self.custom_buffer_start_date:
-                                raise UserError(_('Seems selected location is already booked.'))
-                            if task.custom_buffer_start_date <= self.custom_buffer_end_date and task.custom_buffer_end_date >= self.custom_buffer_end_date:
-                                raise UserError(_('Seems selected location is already booked.'))
+                # if self.custom_booking_id:
+                #     for task in self.custom_booking_id:
+                #         if stage_id.custom_is_confirm:
+                #             if task.custom_buffer_start_date <= self.custom_buffer_start_date and task.custom_buffer_end_date >= self.custom_buffer_start_date:
+                #                 raise UserError(_('Seems selected location is already booked.'))
+                #             if task.custom_buffer_start_date <= self.custom_buffer_end_date and task.custom_buffer_end_date >= self.custom_buffer_end_date:
+                #                 raise UserError(_('Seems selected location is already booked.'))
         return super(ProjectTask, self).write(vals)
 
     def custom_booking_confirm(self):
         stage_id = self.env['project.task.type'].search([('custom_is_confirm', '=', True)], limit=1)
-        self.stage_id = stage_id.id
+        # self.stage_id = stage_id.id
+        self.write({'stage_id' : stage_id.id})
         if not self.custom_booking_number:
             self.custom_booking_number = self.env['ir.sequence'].next_by_code('booking.request.confirm')
 
@@ -159,7 +158,7 @@ class ProjectTask(models.Model):
 
     payment_terms = fields.Many2one('account.payment.term', string="Payment Terms")
     room_price = fields.Float(string="Room Price", compute="_onchange_room_type", store=True)
-    membership_id = fields.Char(string = 'Membership ID', compute="_onchange_room_number_id")
+    membership_id = fields.Char(string='Membership ID', compute="_onchange_member_id")
     custom_name = fields.Char(string="Name")
     custom_age = fields.Char(string="Age")
 
@@ -171,6 +170,7 @@ class ProjectTask(models.Model):
     total_no_guests = fields.Char(string="Total No. Guests", compute="_onchange_guest_member")
 
     guest_or_member = fields.Char(string="Guest or Member")
+
     # room_position = fields.One2many('custom.room.position', 'temp_field', string="Room Position")
     # capacity = fields.Char(string="Capacity", compute="_onchange_room_number_id")
 
@@ -190,9 +190,11 @@ class ProjectTask(models.Model):
             if record.member_id:
                 record.membership_id = str(record.member_id.name) + " " + str(record.member_id.seq_name)
 
-    @api.onchange('guest_or_member', 'number_of_children', 'number_of_adults', 'total_guests', 'custom_booking_id', 'room_number_id')
+    @api.onchange('guest_or_member', 'number_of_children', 'number_of_adults', 'total_guests', 'custom_booking_id',
+                  'room_number_id')
     def _onchange_guest_member(self):
-        if (self.guest_or_member == 'guest') and self.custom_booking_id and self.room_number_id and self.number_of_adults and self.total_guests or self.number_of_children:
+        if (
+                self.guest_or_member == 'guest') and self.custom_booking_id and self.room_number_id and self.number_of_adults and self.total_guests or self.number_of_children:
             self.guest_room_type = self.custom_booking_id.name
             self.guest_room_no_id = self.room_number_id.name
             self.guest_number_of_children = self.number_of_children
@@ -217,7 +219,8 @@ class ProjectTask(models.Model):
             total = record.number_of_adults + record.number_of_children
             if record.number_of_adults and record.number_of_rooms or record.number_of_children:
                 if ((float(total) / float(record.number_of_rooms)) > record.custom_capacity_size):
-                    raise ValidationError(_("More than "+str(record.custom_capacity_size)+" guests not allowed in a single room."))
+                    raise ValidationError(
+                        _("More than " + str(record.custom_capacity_size) + " guests not allowed in a single room."))
                 else:
                     record.total_guests = total
 
@@ -240,6 +243,7 @@ class ProjectTask(models.Model):
         # no_of_nights = end_date - start_date
         # self.total_no_nights = no_of_nights
 
+
 class MembersSequence(models.Model):
     _inherit = 'res.partner'
 
@@ -259,20 +263,9 @@ class MembersSequence(models.Model):
 #     temp_field = fields.Many2one('project.task', string="temp")
 #
 
-    # @api.onchange('custom_booking_id', 'room_number_id', '')
-    # def on_change_room_type(self):
-    #     for record in self:
-    #         if record.custom_boking_id and record.room_number_id:
-    #             record.room_type_column = record.custom_booking_id
-    #             record.room_no_column = record.room_number_id
-
-
-
-
-
-
-
-
-
-
-
+# @api.onchange('custom_booking_id', 'room_number_id', '')
+# def on_change_room_type(self):
+#     for record in self:
+#         if record.custom_boking_id and record.room_number_id:
+#             record.room_type_column = record.custom_booking_id
+#             record.room_no_column = record.room_number_id
