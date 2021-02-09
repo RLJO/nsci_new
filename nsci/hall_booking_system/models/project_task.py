@@ -236,6 +236,8 @@ class ProjectTask(models.Model):
                 self.total_no_nights = r.days
             else:
                 raise ValidationError(_("Select a valid Start date."))
+        else:
+            self.total_no_nights = 0
 
         # for i in self:
         # end_date = self.custom_end_date.strftime("%dd/%mm%yyyy")
